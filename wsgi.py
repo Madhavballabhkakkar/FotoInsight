@@ -1,4 +1,4 @@
-"""WSGI entry used by Vercel and other hosts."""
+"""WSGI entry used by Render (Gunicorn) and other hosts."""
 
 import os
 

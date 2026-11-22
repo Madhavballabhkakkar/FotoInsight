@@ -13,9 +13,6 @@ dependencies = [
   "fpdf2>=2.7",
   "openpyxl>=3.1",
   "python-dotenv>=1.0",
-  # scikit-learn is optional (forecast only). Omitting it keeps the Vercel
-  # function under the free size limit; local installs can still add it.
+  "scikit-learn>=1.4",
+  "gunicorn>=22",
 ]
-
-[tool.vercel]
-entrypoint = "wsgi:app"
