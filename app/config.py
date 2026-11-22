@@ -17,6 +17,9 @@ class Config:
     MYSQL_DATABASE = os.environ.get("MYSQL_DATABASE", "fotoinsight")
     # Cloud MySQL hosts (Aiven, Railway, TiDB, etc.) usually need TLS.
     MYSQL_SSL = os.environ.get("MYSQL_SSL", "0") == "1"
+    # Firebase Realtime Database REST API (compulsory cloud sync).
+    FIREBASE_DB_URL = os.environ.get("FIREBASE_DB_URL", "").rstrip("/")
+    FIREBASE_AUTH_TOKEN = os.environ.get("FIREBASE_AUTH_TOKEN", "")
     MAX_CONTENT_LENGTH = 2 * 1024 * 1024
     PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
     SESSION_COOKIE_HTTPONLY = True

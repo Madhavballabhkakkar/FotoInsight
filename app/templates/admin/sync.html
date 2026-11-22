@@ -1,0 +1,108 @@
+{% extends "admin/base.html" %}
+{% block title %}Data Sync{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Data Sync</h1>
+    <p class="sub">Compulsory local persistence (JSON, CSV, Excel) and Firebase Realtime Database REST sync.</p>
+  </div>
+</div>
+
+<section class="panel">
+  <h2>How this fits the project</h2>
+  <p>MySQL remains the live office database for day-to-day work and Pandas analytics.</p>
+  <p>This screen also writes the same records to local <strong>JSON</strong>, <strong>CSV</strong>, and <strong>Excel</strong> files, then can push them to <strong>Firebase Realtime Database</strong> with a REST <code>PUT</code>/<code>GET</code>.</p>
+  <p class="note">Local folder: <code>{{ data_folder }}</code></p>
+</section>
+
+<section class="panel">
+  <h2>1. Local storage · JSON / CSV / Excel</h2>
+  <p>Creates one JSON, one CSV, and one Excel file per table, plus a combined bundle.</p>
+  <button class="btn-gold" type="button" id="btn-local">Export to local files</button>
+  <div class="alert alert-danger form-alert d-none mt-3" id="local-alert"></div>
+  <pre class="note mt-3" id="local-result" style="white-space:pre-wrap"></pre>
+</section>
+
+<section class="panel">
+  <h2>2. Cloud synchronization · Firebase REST API</h2>
+  {% if firebase_ready %}
+  <p class="note">Configured URL: <code>{{ firebase_url }}</code></p>
+  {% else %}
+  <p class="note">Set <code>FIREBASE_DB_URL</code> in <code>.env</code> first. Example: <code>https://your-project-default-rtdb.firebaseio.com</code></p>
+  {% endif %}
+  <div style="display:flex; gap:0.6rem; flex-wrap:wrap">
+    <button class="btn-gold" type="button" id="btn-push" {% if not firebase_ready %}disabled{% endif %}>Push to Firebase</button>
+    <button class="btn-quiet" type="button" id="btn-pull" {% if not firebase_ready %}disabled{% endif %}>Read from Firebase</button>
+  </div>
+  <div class="alert alert-danger form-alert d-none mt-3" id="firebase-alert"></div>
+  <pre class="note mt-3" id="firebase-result" style="white-space:pre-wrap"></pre>
+</section>
+
+<section class="panel">
+  <h2>Files currently in /data</h2>
+  <table class="data">
+    <thead><tr><th>File</th><th>Type</th><th>Size</th></tr></thead>
+    <tbody id="file-rows">
+      {% for file in files %}
+      <tr><td>{{ file.name }}</td><td>{{ file.kind }}</td><td>{{ file.size }} bytes</td></tr>
+      {% else %}
+      <tr><td colspan="3">No local files yet. Click Export to local files.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+async function call(url, method, alertId, resultId) {
+  const alertBox = document.getElementById(alertId);
+  const resultBox = document.getElementById(resultId);
+  alertBox.classList.add("d-none");
+  resultBox.textContent = "Working…";
+  try {
+    const response = await fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+        "X-Requested-With": "fetch",
+      },
+      body: method === "POST" ? "{}" : undefined,
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "Request failed.");
+    resultBox.textContent = JSON.stringify(data, null, 2);
+    if (method === "POST") refreshFiles();
+  } catch (error) {
+    resultBox.textContent = "";
+    alertBox.textContent = error.message;
+    alertBox.classList.remove("d-none");
+  }
+}
+
+async function refreshFiles() {
+  const response = await fetch("/api/sync/files", {
+    headers: { "X-Requested-With": "fetch", "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content },
+  });
+  const data = await response.json();
+  const body = document.getElementById("file-rows");
+  if (!data.files || !data.files.length) {
+    body.innerHTML = "<tr><td colspan='3'>No local files yet.</td></tr>";
+    return;
+  }
+  body.innerHTML = data.files.map((file) =>
+    `<tr><td>${file.name}</td><td>${file.kind}</td><td>${file.size} bytes</td></tr>`
+  ).join("");
+}
+
+document.getElementById("btn-local").addEventListener("click", () =>
+  call("/api/sync/local", "POST", "local-alert", "local-result")
+);
+document.getElementById("btn-push").addEventListener("click", () =>
+  call("/api/sync/firebase", "POST", "firebase-alert", "firebase-result")
+);
+document.getElementById("btn-pull").addEventListener("click", () =>
+  call("/api/sync/firebase", "GET", "firebase-alert", "firebase-result")
+);
+</script>
+{% endblock %}

@@ -145,10 +145,12 @@ def create_app(config_object=None):
     from app.routes.reports import bp as reports_bp
     from app.routes.services import bp as services_bp
     from app.routes.settings import bp as settings_bp
+    from app.routes.sync import bp as sync_bp
 
     for blueprint in (
         public_bp, auth_bp, dashboard_bp, customers_bp, enquiries_bp, bookings_bp,
         services_bp, payments_bp, projects_bp, analytics_bp, reports_bp, settings_bp,
+        sync_bp,
     ):
         app.register_blueprint(blueprint)
 
