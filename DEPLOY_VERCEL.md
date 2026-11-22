@@ -2,7 +2,18 @@
 
 Vercel hosts the Flask app. MySQL must be a separate free cloud database.
 
-## 1. Create a free MySQL database
+**Important:** `scikit-learn` is not installed on Vercel (package size limit). The Analytics forecast section will say the library is missing. All other analytics still work with Pandas and NumPy. Install `scikit-learn` locally with `pip install -r requirements-dev.txt` if you need the forecast on your laptop.
+
+## 1. Claim the temporary deploy (or log in)
+
+Open the claim URL from the CLI, or:
+
+```bash
+vercel login
+vercel --prod
+```
+
+## 2. Create a free MySQL database
 
 Pick one:
 
@@ -13,7 +24,7 @@ Pick one:
 
 Create a database named `fotoinsight` (or note the name they give you).
 
-## 2. Seed the remote database (from your laptop)
+## 3. Seed the remote database (from your laptop)
 
 In `.env`, temporarily point at the cloud DB:
 
@@ -33,17 +44,9 @@ source .venv/bin/activate
 python database/seed_data.py --reset
 ```
 
-## 3. Deploy
-
-```bash
-npm i -g vercel
-vercel login
-vercel --prod
-```
-
 ## 4. Set Vercel environment variables
 
-In the Vercel project → Settings → Environment Variables:
+In the Vercel project → Settings → Environment Variables (Production):
 
 | Name | Value |
 | --- | --- |
@@ -56,7 +59,11 @@ In the Vercel project → Settings → Environment Variables:
 | `MYSQL_DATABASE` | `fotoinsight` |
 | `MYSQL_SSL` | `1` |
 
-Redeploy after saving env vars.
+Redeploy after saving env vars:
+
+```bash
+vercel --prod
+```
 
 ## Notes for viva
 
