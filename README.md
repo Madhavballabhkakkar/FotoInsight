@@ -17,20 +17,11 @@ Change these passwords from **Settings** before you put the app on a public serv
 
 ## Run it on your computer
 
-1. Install Python 3 and MySQL 8. Start MySQL.
+No MySQL server is required. The app uses a SQLite file.
 
-2. Create a database and a user. Pick your own password:
+1. Install Python 3.
 
-```sql
-CREATE DATABASE fotoinsight CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE DATABASE fotoinsight_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'fotoinsight'@'localhost' IDENTIFIED BY 'your-password';
-GRANT ALL PRIVILEGES ON fotoinsight.* TO 'fotoinsight'@'localhost';
-GRANT ALL PRIVILEGES ON fotoinsight_test.* TO 'fotoinsight'@'localhost';
-FLUSH PRIVILEGES;
-```
-
-3. In this folder:
+2. In this folder:
 
 ```bash
 python3 -m venv .venv
@@ -39,16 +30,18 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-4. Edit `.env`. Set `SECRET_KEY` to a long random string and `MYSQL_PASSWORD` to the password you chose. Do not commit `.env`.
+3. Edit `.env` and set `SECRET_KEY` to a long random string. Do not commit `.env`.
 
-5. Build the tables and the demo rows. This **deletes** anything already in the `fotoinsight` database:
+4. Build the tables and the demo rows (this recreates `instance/fotoinsight.db`):
 
 ```bash
 python database/seed_data.py --reset
 python run.py
 ```
 
-6. Open [http://127.0.0.1:5000](http://127.0.0.1:5000). The office is at [http://127.0.0.1:5000/admin/login](http://127.0.0.1:5000/admin/login).
+5. Open [http://127.0.0.1:5000](http://127.0.0.1:5000) (or port `5050` if you set `PORT=5050`). The office is at `/admin/login`.
+
+Free deploy notes: see `DEPLOY_RENDER.md` and `DEPLOY_FREE.md`.
 
 ## How to test each part
 

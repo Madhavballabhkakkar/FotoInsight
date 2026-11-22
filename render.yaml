@@ -3,7 +3,7 @@ services:
     name: fotoinsight
     runtime: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && python database/seed_data.py --reset
     startCommand: gunicorn -w 1 -b 0.0.0.0:$PORT "wsgi:app"
     healthCheckPath: /health
     envVars:
@@ -13,15 +13,9 @@ services:
         value: "3.12.8"
       - key: SECRET_KEY
         generateValue: true
-      - key: MYSQL_HOST
+      - key: SQLITE_PATH
+        value: instance/fotoinsight.db
+      - key: FIREBASE_DB_URL
         sync: false
-      - key: MYSQL_PORT
-        value: "3306"
-      - key: MYSQL_USER
+      - key: FIREBASE_AUTH_TOKEN
         sync: false
-      - key: MYSQL_PASSWORD
-        sync: false
-      - key: MYSQL_DATABASE
-        sync: false
-      - key: MYSQL_SSL
-        value: "1"

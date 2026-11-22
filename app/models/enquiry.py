@@ -1,8 +1,6 @@
 """Enquiries from the public site and from the admin desk."""
 
-from pymysql.err import IntegrityError
-
-from app.db import execute, query_all, query_one, transaction, tx_execute, tx_query_one
+from app.db import IntegrityError, execute, query_all, query_one, transaction, tx_execute, tx_query_one
 from app.errors import AppError
 from app.utils import clean_row, clean_rows, code_for, like, pagination
 

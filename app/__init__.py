@@ -5,11 +5,10 @@ import secrets
 
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from flask.json.provider import DefaultJSONProvider
-from pymysql.err import IntegrityError, OperationalError
 from werkzeug.exceptions import RequestEntityTooLarge
 
 from app.config import Config, ProductionConfig
-from app.db import close_db, query_one
+from app.db import IntegrityError, OperationalError, close_db, query_one
 from app.errors import AppError
 
 
@@ -173,7 +172,7 @@ def create_app(config_object=None):
     @app.errorhandler(OperationalError)
     def handle_database(err):
         app.logger.exception("Database error")
-        message = "The database could not be reached. Check that MySQL is running and the .env settings are correct."
+        message = "The database could not be reached. Check SQLITE_PATH and that the app can write its data folder."
         if _json_error():
             return jsonify({"error": message}), 500
         return render_template("error.html", message=message), 500

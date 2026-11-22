@@ -103,24 +103,22 @@ def main():
     if not args.reset:
         raise SystemExit("Refusing to continue without --reset. This script deletes the current FotoInsight tables.")
 
-    database = os.environ.get("MYSQL_DATABASE", "fotoinsight")
-    if database.endswith("_test"):
+    db_path = os.environ.get(
+        "SQLITE_PATH",
+        str(ROOT / "instance" / "fotoinsight.db"),
+    )
+    if Path(db_path).name.endswith("_test.db") or "test" in Path(db_path).stem:
         raise SystemExit("Refusing to seed the test database.")
 
-    connection = connect_raw(
-        os.environ.get("MYSQL_HOST", "localhost"),
-        os.environ.get("MYSQL_PORT", 3306),
-        os.environ.get("MYSQL_USER", "fotoinsight"),
-        os.environ.get("MYSQL_PASSWORD", ""),
-        database,
-    )
+    connection = connect_raw(db_path)
     rng = random.Random(42)
     apply_schema(connection)
     with connection.cursor() as cur:
         _seed(cur, rng)
     connection.commit()
     connection.close()
-    print("Demo data loaded. Log in at /admin/login")
+    print(f"Demo data loaded into {db_path}")
+    print("Log in at /admin/login")
     print("Admin username: admin    password: Admin@123")
     print("Employee username: employee    password: Employee@123")
     print("All business rows are marked is_demo = 1 and are synthetic.")

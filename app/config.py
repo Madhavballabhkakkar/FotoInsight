@@ -2,21 +2,18 @@
 
 import os
 from datetime import timedelta
+from pathlib import Path
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
+ROOT = Path(__file__).resolve().parents[1]
+
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-change-me")
-    MYSQL_HOST = os.environ.get("MYSQL_HOST", "localhost")
-    MYSQL_PORT = int(os.environ.get("MYSQL_PORT", "3306"))
-    MYSQL_USER = os.environ.get("MYSQL_USER", "fotoinsight")
-    MYSQL_PASSWORD = os.environ.get("MYSQL_PASSWORD", "")
-    MYSQL_DATABASE = os.environ.get("MYSQL_DATABASE", "fotoinsight")
-    # Cloud MySQL hosts (Aiven, Railway, TiDB, etc.) usually need TLS.
-    MYSQL_SSL = os.environ.get("MYSQL_SSL", "0") == "1"
+    SQLITE_PATH = os.environ.get("SQLITE_PATH", str(ROOT / "instance" / "fotoinsight.db"))
     # Firebase Realtime Database REST API (compulsory cloud sync).
     FIREBASE_DB_URL = os.environ.get("FIREBASE_DB_URL", "").rstrip("/")
     FIREBASE_AUTH_TOKEN = os.environ.get("FIREBASE_AUTH_TOKEN", "")
@@ -37,4 +34,4 @@ class TestConfig(Config):
     TESTING = True
     DEBUG = False
     SECRET_KEY = "test-secret"
-    MYSQL_DATABASE = os.environ.get("MYSQL_TEST_DATABASE", "fotoinsight_test")
+    SQLITE_PATH = str(ROOT / "instance" / "fotoinsight_test.db")

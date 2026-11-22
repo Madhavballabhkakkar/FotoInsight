@@ -1,6 +1,5 @@
-"""Fresh MySQL test database for each test."""
+"""Fresh SQLite test database for each test."""
 
-import os
 import sys
 from pathlib import Path
 
@@ -15,20 +14,13 @@ from app.config import TestConfig
 from app.schema import apply_schema, connect_raw
 
 
-def _connect():
-    return connect_raw(
-        os.environ.get("MYSQL_HOST", "localhost"),
-        os.environ.get("MYSQL_PORT", 3306),
-        os.environ.get("MYSQL_USER", "fotoinsight"),
-        os.environ.get("MYSQL_PASSWORD", ""),
-        os.environ.get("MYSQL_TEST_DATABASE", "fotoinsight_test"),
-    )
-
-
 @pytest.fixture
 def app():
+    db_path = Path(TestConfig.SQLITE_PATH)
+    if db_path.exists():
+        db_path.unlink()
     application = create_app(TestConfig)
-    connection = _connect()
+    connection = connect_raw(db_path)
     apply_schema(connection)
     with connection.cursor() as cur:
         cur.execute(
@@ -69,6 +61,8 @@ def app():
     connection.commit()
     connection.close()
     yield application
+    if db_path.exists():
+        db_path.unlink()
 
 
 @pytest.fixture

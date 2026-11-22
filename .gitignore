@@ -5,7 +5,8 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/
-instance/
+instance/*
+!instance/.gitkeep
 *.log
 .DS_Store
 .vercel

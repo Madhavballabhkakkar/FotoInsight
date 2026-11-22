@@ -1,8 +1,6 @@
 """Photography services and the packages sold under them."""
 
-from pymysql.err import IntegrityError
-
-from app.db import execute, query_all, query_one
+from app.db import IntegrityError, execute, query_all, query_one
 from app.errors import AppError
 from app.utils import clean_row, clean_rows, slugify
 
