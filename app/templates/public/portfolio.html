@@ -1,0 +1,34 @@
+{% extends "public/base.html" %}
+{% block title %}Portfolio · {{ business.business_name }}{% endblock %}
+{% block body %}
+<header class="page-hero">
+  <div class="container">
+    <div class="eyebrow">Portfolio</div>
+    <h1>A look at the kind of work.</h1>
+    <p class="lede">These are royalty-free photographs used to demonstrate the gallery. They are not client weddings from this studio.</p>
+  </div>
+</header>
+<section class="section" style="padding-top:1rem">
+  <div class="container">
+    <div class="filters">
+      {% for key, name in categories %}
+      <button type="button" data-filter="{{ key }}" class="{{ 'active' if key == 'all' else '' }}">{{ name }}</button>
+      {% endfor %}
+    </div>
+    <div class="gallery">
+      {% for item in items %}
+      <a href="{{ url_for('static', filename=item.src) }}" data-category="{{ item.category }}" data-preview="{{ url_for('static', filename=item.src) }}" data-title="{{ item.title }} · {{ item.location }}">
+        <img src="{{ url_for('static', filename=item.src) }}" alt="{{ item.title }}">
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<div class="lightbox">
+  <button type="button" aria-label="Close preview">&times;</button>
+  <div>
+    <img alt="">
+    <p class="text-white mt-2 mb-0"></p>
+  </div>
+</div>
+{% endblock %}

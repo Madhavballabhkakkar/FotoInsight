@@ -1,0 +1,48 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ booking.booking_code }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ booking.event_name }}</h1>
+    <p class="sub">{{ booking.booking_code }} · {{ booking.customer_name }} · <span class="status s-{{ booking.status }}">{{ booking.status|status_label }}</span></p>
+  </div>
+  {% if current_user.role == 'admin' %}
+  <div class="d-flex gap-2">
+    <a class="btn-quiet" href="{{ url_for('bookings.edit_booking', booking_id=booking.id) }}">Edit</a>
+    <a class="btn-gold" href="{{ url_for('payments.new_payment', booking=booking.id) }}">Record payment</a>
+    <button class="btn-quiet" type="button" data-delete="{{ url_for('bookings.api_delete', booking_id=booking.id) }}" data-after="{{ url_for('bookings.booking_list') }}" data-confirm="Delete this booking and its payments?">Delete</button>
+  </div>
+  {% endif %}
+</div>
+<div class="kpis">
+  <article class="kpi"><span>Contract</span><strong style="font-size:1.5rem">{{ booking.total_amount|inr }}</strong><small>Agreed amount. Not the same as revenue.</small></article>
+  <article class="kpi"><span>Advance / collected</span><strong style="font-size:1.5rem">{{ booking.received|inr }}</strong><small>Paid and partially paid, minus refunds.</small></article>
+  <article class="kpi"><span>Remaining</span><strong style="font-size:1.5rem">{{ booking.outstanding|inr }}</strong><small>Collection status: {{ booking.collection_status|status_label }}</small></article>
+  <article class="kpi"><span>When</span><strong style="font-size:1.3rem">{{ booking.event_date }}</strong><small>{{ booking.event_location }}, {{ booking.city }}</small></article>
+</div>
+<div class="panel">
+  <p>Service {{ booking.service_name }} · Package {{ booking.package_name or "—" }}</p>
+  {% if booking.enquiry_code %}<p>From enquiry {{ booking.enquiry_code }}</p>{% endif %}
+  <p>{{ booking.notes or "No notes." }}</p>
+  <h2>Team</h2>
+  {% for member in booking.team %}
+  <div>{{ member.full_name }} · {{ member.team_role }}{% if member.is_lead %} · lead{% endif %}</div>
+  {% else %}<p class="note">No team assigned.</p>{% endfor %}
+</div>
+<div class="panel">
+  <h2>Payments</h2>
+  <table class="data">
+    <thead><tr><th>Payment</th><th>Date</th><th>Method</th><th>Amount</th><th>Status</th><th>Reference</th></tr></thead>
+    <tbody>
+      {% for pay in booking.payments %}
+      <tr>
+        <td>{% if current_user.role == 'admin' %}<a href="{{ url_for('payments.edit_payment', payment_id=pay.id) }}">{{ pay.payment_code }}</a>{% else %}{{ pay.payment_code }}{% endif %}</td>
+        <td>{{ pay.payment_date }}</td><td>{{ pay.method|status_label }}</td><td>{{ pay.amount|inr }}</td>
+        <td><span class="status s-{{ pay.status }}">{{ pay.status|status_label }}</span></td>
+        <td>{{ pay.transaction_ref or "—" }}</td>
+      </tr>
+      {% else %}<tr><td colspan="6">No payments recorded. The contract is not counted as revenue.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

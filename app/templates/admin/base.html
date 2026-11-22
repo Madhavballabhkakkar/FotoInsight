@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{% block title %}Studio{% endblock %} · FotoInsight</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Outfit:wght@360;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="admin">
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="{{ url_for('dashboard.overview') }}">FotoInsight</a>
+      {% set endpoint = request.endpoint or '' %}
+      <a class="nav-item {{ 'active' if endpoint == 'dashboard.overview' else '' }}" href="{{ url_for('dashboard.overview') }}">Overview</a>
+      <a class="nav-item {{ 'active' if 'customer' in endpoint else '' }}" href="{{ url_for('customers.customer_list') }}">Customers</a>
+      <a class="nav-item {{ 'active' if 'enquir' in endpoint else '' }}" href="{{ url_for('enquiries.enquiry_list') }}">Enquiries</a>
+      <a class="nav-item {{ 'active' if 'booking' in endpoint else '' }}" href="{{ url_for('bookings.booking_list') }}">Bookings</a>
+      {% if current_user.role == 'admin' %}
+      <a class="nav-item {{ 'active' if 'service' in endpoint or 'package' in endpoint else '' }}" href="{{ url_for('services.service_list') }}">Services</a>
+      {% endif %}
+      <a class="nav-item {{ 'active' if 'project' in endpoint else '' }}" href="{{ url_for('projects.project_list') }}">Projects</a>
+      {% if current_user.role == 'admin' %}
+      <a class="nav-item {{ 'active' if 'payment' in endpoint else '' }}" href="{{ url_for('payments.payment_list') }}">Payments</a>
+      <a class="nav-item {{ 'active' if endpoint == 'analytics.analytics_page' else '' }}" href="{{ url_for('analytics.analytics_page') }}">Analytics</a>
+      <a class="nav-item {{ 'active' if 'report' in endpoint else '' }}" href="{{ url_for('reports.reports_page') }}">Reports</a>
+      <a class="nav-item {{ 'active' if 'setting' in endpoint else '' }}" href="{{ url_for('settings.settings_page') }}">Settings</a>
+      {% endif %}
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <button class="icon-btn menu-toggle" type="button" data-sidebar aria-label="Open menu">Menu</button>
+        <form class="search-form" method="get" action="{{ url_for('dashboard.search_page') }}">
+          <input type="search" name="q" placeholder="Search customers, enquiries, bookings" aria-label="Search" value="{{ request.args.get('q','') if request.endpoint == 'dashboard.search_page' else '' }}">
+        </form>
+        <div style="position:relative">
+          <button class="icon-btn" type="button" data-pop="#notice-menu" aria-label="Notifications">
+            Inbox
+            {% if notification_count %}<span class="badge-count">{{ notification_count }}</span>{% endif %}
+          </button>
+          <div class="menu-pop" id="notice-menu">
+            {% for item in notifications %}
+            <a href="{{ url_for('enquiries.enquiry_detail', enquiry_id=item.id) }}">{{ item.enquiry_code }} · {{ item.full_name }}</a>
+            {% else %}
+            <div class="note" style="padding:0.4rem 0.5rem">No new items.</div>
+            {% endfor %}
+          </div>
+        </div>
+        <div style="position:relative">
+          <button class="icon-btn" type="button" data-pop="#profile-menu">{{ current_user.display_name }}</button>
+          <div class="menu-pop" id="profile-menu">
+            <div class="note" style="padding:0.4rem 0.5rem">{{ current_user.role|status_label }}</div>
+            <form method="post" action="{{ url_for('auth.logout') }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button type="submit">Log out</button>
+            </form>
+          </div>
+        </div>
+      </header>
+      <main class="content">
+        {% if show_demo_banner %}
+        <div class="demo-banner">Demo data: the numbers on these screens are calculated from synthetic records for a student project. They are not Fotographiya's, or any real studio's, business performance.</div>
+        {% endif %}
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='vendor/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

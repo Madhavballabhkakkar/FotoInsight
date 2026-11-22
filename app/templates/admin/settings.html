@@ -1,0 +1,98 @@
+{% extends "admin/base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Settings</h1><p class="sub">Public contact details and the people who can be assigned to jobs.</p></div></div>
+<form class="stack panel" data-api="{{ url_for('settings.update_settings') }}" data-method="PUT" data-reload="1">
+  <h2>Business information</h2>
+  <div class="alert alert-danger form-alert d-none"></div>
+  <label>Business name<input name="business_name" required value="{{ settings.business_name }}"></label>
+  <label>Tagline<input name="tagline" required value="{{ settings.tagline }}"></label>
+  <label>Email<input name="email" type="email" required value="{{ settings.email }}"></label>
+  <label>Phone<input name="phone" required value="{{ settings.phone }}"></label>
+  <label>Address<input name="address" required value="{{ settings.address }}"></label>
+  <label>City<input name="city" required value="{{ settings.city }}"></label>
+  <label>Map latitude<input name="map_lat" required value="{{ settings.map_lat }}"></label>
+  <label>Map longitude<input name="map_lng" required value="{{ settings.map_lng }}"></label>
+  <label>Instagram URL<input name="instagram_url" value="{{ settings.instagram_url or '' }}"></label>
+  <label>Facebook URL<input name="facebook_url" value="{{ settings.facebook_url or '' }}"></label>
+  <label>YouTube URL<input name="youtube_url" value="{{ settings.youtube_url or '' }}"></label>
+  <label>About introduction<textarea name="about_intro" rows="4">{{ settings.about_intro or '' }}</textarea></label>
+  <label>Mission<textarea name="mission" rows="3">{{ settings.mission or '' }}</textarea></label>
+  <label>Vision<textarea name="vision" rows="3">{{ settings.vision or '' }}</textarea></label>
+  <button class="btn-gold" type="submit">Save business details</button>
+</form>
+<section class="panel">
+  <h2>Employees</h2>
+  <table class="data">
+    <thead><tr><th>Name</th><th>Role</th><th>City</th><th>Status</th><th>Login</th><th></th></tr></thead>
+    <tbody>
+      {% for person in employees %}
+      <tr>
+        <td>{{ person.full_name }}<div class="note">{{ person.email }} · {{ person.phone }}</div></td>
+        <td>{{ person.job_title }}</td><td>{{ person.city }}</td>
+        <td><span class="status s-{{ person.status }}">{{ person.status|status_label }}</span></td>
+        <td>{{ person.login.username if person.login else "No login" }}</td>
+        <td><button type="button" class="btn-quiet" data-edit="{{ person.id }}">Edit</button></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <h2 class="mt-4" id="employee-heading">Add employee</h2>
+  <form class="stack" id="employee-form" data-api="{{ url_for('settings.api_create_employee') }}" data-method="POST" data-reload="1">
+    <div class="alert alert-danger form-alert d-none"></div>
+    <input type="hidden" name="employee_id" value="">
+    <label>Full name<input name="full_name" required></label>
+    <label>Email<input name="email" type="email" required></label>
+    <label>Phone<input name="phone" required></label>
+    <label>Job title<input name="job_title" required placeholder="Photographer"></label>
+    <label>City<input name="city" required></label>
+    <label>Status<select name="status"><option value="active">Active</option><option value="inactive">Inactive</option></select></label>
+    <button class="btn-gold" type="submit">Save employee</button>
+  </form>
+  <h2 class="mt-4">Give an employee a login</h2>
+  <form class="stack" data-api="" id="login-form" data-method="POST" data-reload="1">
+    <div class="alert alert-danger form-alert d-none"></div>
+    <label>Employee
+      <select id="login-employee" required>
+        {% for person in employees if not person.login %}<option value="{{ person.id }}">{{ person.full_name }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Username<input name="username" required></label>
+    <label>Password<input name="password" type="password" required></label>
+    <label>Role<select name="role"><option value="employee">Employee</option><option value="admin">Admin</option></select></label>
+    <button class="btn-quiet" type="submit">Create login</button>
+  </form>
+</section>
+<form class="stack panel" data-api="{{ url_for('settings.change_password') }}" data-method="POST">
+  <h2>Your password</h2>
+  <div class="alert alert-danger form-alert d-none"></div>
+  <label>Current password<input name="current_password" type="password" required></label>
+  <label>New password<input name="new_password" type="password" required></label>
+  <button class="btn-gold" type="submit">Update password</button>
+</form>
+<script id="employee-data" type="application/json">{{ employees|tojson }}</script>
+{% endblock %}
+{% block scripts %}
+<script>
+const people = JSON.parse(document.getElementById("employee-data").textContent);
+document.querySelectorAll("[data-edit]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const person = people.find((item) => item.id === Number(button.dataset.edit));
+    const form = document.getElementById("employee-form");
+    form.dataset.api = `/api/employees/${person.id}`;
+    form.dataset.method = "PUT";
+    form.full_name.value = person.full_name;
+    form.email.value = person.email;
+    form.phone.value = person.phone;
+    form.job_title.value = person.job_title;
+    form.city.value = person.city;
+    form.status.value = person.status;
+    document.getElementById("employee-heading").textContent = "Edit employee";
+  });
+});
+document.getElementById("login-form").addEventListener("submit", (event) => {
+  const id = document.getElementById("login-employee").value;
+  event.currentTarget.dataset.api = `/api/employees/${id}/login`;
+});
+</script>
+{% endblock %}

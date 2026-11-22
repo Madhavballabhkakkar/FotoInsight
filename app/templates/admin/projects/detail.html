@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ project.project_code }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ project.project_code }}</h1>
+    <p class="sub">{{ project.event_name }} · {{ project.customer_name }} · <span class="status s-{{ project.status }}">{{ project.status|status_label }}</span>{% if project.is_delayed %} · delayed{% endif %}</p>
+  </div>
+  {% if current_user.role == 'admin' %}
+  <div class="d-flex gap-2">
+    <a class="btn-quiet" href="{{ url_for('projects.edit_project', project_id=project.id) }}">Edit</a>
+    <button class="btn-quiet" type="button" data-delete="{{ url_for('projects.api_delete', project_id=project.id) }}" data-after="{{ url_for('projects.project_list') }}">Delete</button>
+  </div>
+  {% endif %}
+</div>
+<div class="panel">
+  <p>Booking <a href="{{ url_for('bookings.booking_detail', booking_id=project.booking_id) }}">{{ project.booking_code }}</a> · Event {{ project.event_date }} · {{ project.event_location }}, {{ project.city }}</p>
+  <p>Photographer {{ project.photographer_name or "unassigned" }} · Editor {{ project.editor_name or "unassigned" }}</p>
+  <p>Starts {{ project.start_date or "—" }} · Delivery {{ project.delivery_date or "—" }}</p>
+  <p>{{ project.notes or "No notes." }}</p>
+</div>
+<form class="stack panel" data-api="{{ url_for('projects.api_update', project_id=project.id) }}" data-method="PUT" data-reload="1">
+  <h2>Update status</h2>
+  <div class="alert alert-danger form-alert d-none"></div>
+  <label>Status<select name="status">{% for key, label in project_statuses %}<option value="{{ key }}" {{ 'selected' if project.status==key else '' }}>{{ label }}</option>{% endfor %}</select></label>
+  <label>Notes<textarea name="notes" rows="3">{{ project.notes or '' }}</textarea></label>
+  <button class="btn-gold" type="submit">Save status</button>
+  {% if current_user.role == 'employee' %}<p class="note">Your login can change status and notes on projects assigned to you.</p>{% endif %}
+</form>
+{% endblock %}

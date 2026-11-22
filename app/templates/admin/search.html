@@ -1,0 +1,12 @@
+{% extends "admin/base.html" %}
+{% block title %}Search{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Search</h1><p class="sub">{{ q or "Type at least two letters in the top search." }}</p></div></div>
+<div class="panel">
+  {% for item in results %}
+  <div class="insight"><a href="{{ item.url }}">{{ item.type }} · {{ item.label }}</a><div class="note">{{ item.meta }}</div></div>
+  {% else %}
+  {% if q %}<p>No matching records.</p>{% endif %}
+  {% endfor %}
+</div>
+{% endblock %}

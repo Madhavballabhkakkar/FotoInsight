@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ enquiry.enquiry_code }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ enquiry.enquiry_code }}</h1>
+    <p class="sub">{{ enquiry.full_name }} · {{ enquiry.event_type }} · <span class="status s-{{ enquiry.status }}">{{ enquiry.status|status_label }}</span></p>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn-quiet" href="{{ url_for('enquiries.edit_enquiry', enquiry_id=enquiry.id) }}">Edit</a>
+    {% if current_user.role == 'admin' and not enquiry.booking_id %}
+    <button class="btn-gold" type="button" data-post="{{ url_for('enquiries.api_convert', enquiry_id=enquiry.id) }}" data-confirm="Create a booking from this enquiry?">Convert to booking</button>
+    {% endif %}
+    {% if current_user.role == 'admin' %}
+    <button class="btn-quiet" type="button" data-delete="{{ url_for('enquiries.api_delete', enquiry_id=enquiry.id) }}" data-after="{{ url_for('enquiries.enquiry_list') }}" data-confirm="Delete this enquiry?">Delete</button>
+    {% endif %}
+  </div>
+</div>
+<div class="panel">
+  <p>Email {{ enquiry.email }} · Phone {{ enquiry.phone }}</p>
+  <p>Date {{ enquiry.event_date or "not set" }} · {{ enquiry.event_location or "Location not set" }} · {{ enquiry.city or "" }}</p>
+  <p>Guests {{ enquiry.guest_count if enquiry.guest_count is not none else "—" }} · Budget {{ enquiry.estimated_budget|inr if enquiry.estimated_budget is not none else "—" }} · Package {{ enquiry.package_name or "—" }}</p>
+  <p>{{ enquiry.requirements or "No extra requirements." }}</p>
+  {% if enquiry.booking_id %}<p>Linked booking: <a href="{{ url_for('bookings.booking_detail', booking_id=enquiry.booking_id) }}">{{ enquiry.booking_code }}</a></p>{% endif %}
+  <p class="note">Received {{ enquiry.created_at }} via {{ enquiry.source }}{% if enquiry.is_demo %} · demo record{% endif %}.</p>
+</div>
+{% if current_user.role == 'admin' %}
+<form class="filters panel" data-api="{{ url_for('enquiries.api_assign', enquiry_id=enquiry.id) }}" data-reload="1">
+  <div class="alert alert-danger form-alert d-none"></div>
+  <label>Assign <select name="employee_id"><option value="">Unassigned</option>{% for person in employees %}<option value="{{ person.id }}" {{ 'selected' if enquiry.assigned_employee_id==person.id else '' }}>{{ person.full_name }} · {{ person.job_title }}</option>{% endfor %}</select></label>
+  <button class="btn-quiet" type="submit">Save assignment</button>
+</form>
+{% endif %}
+<div class="panel">
+  <h2>Internal notes</h2>
+  {% for note in notes %}
+  <div class="insight"><strong>{{ note.display_name }}</strong> · {{ note.created_at }}<div>{{ note.note }}</div></div>
+  {% else %}<p class="note">No notes yet.</p>{% endfor %}
+  <form class="stack mt-3" data-api="{{ url_for('enquiries.api_note', enquiry_id=enquiry.id) }}" data-reload="1">
+    <div class="alert alert-danger form-alert d-none"></div>
+    <label>Add a note<textarea name="note" required maxlength="2000"></textarea></label>
+    <button class="btn-gold" type="submit">Save note</button>
+  </form>
+</div>
+{% endblock %}

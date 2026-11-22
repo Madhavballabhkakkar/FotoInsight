@@ -1,0 +1,106 @@
+{% extends "public/base.html" %}
+{% set hero = true %}
+{% block title %}{{ business.business_name }}{% endblock %}
+{% block nav_class %}{% endblock %}
+{% block nav_tone %}hero-nav{% endblock %}
+{% block body %}
+<header class="hero" style="background-image:url('{{ url_for('static', filename='images/hero/hero.jpg') }}')">
+  <div class="container content">
+    <div class="eyebrow">Photography and film</div>
+    <h1>Stories, told in light.</h1>
+    <p class="lede">{{ business.tagline }} Weddings, pre-wedding sessions, celebrations, and films, planned from the first conversation through to the album.</p>
+    <div class="d-flex flex-wrap gap-2 mt-4">
+      <a class="btn-gold" href="{{ url_for('public.portfolio') }}">Explore our work</a>
+      <a class="btn-line" href="{{ url_for('public.services') }}">View services</a>
+      <a class="btn-line" href="{{ url_for('public.enquiry') }}">Submit an enquiry</a>
+    </div>
+  </div>
+</header>
+<section class="section">
+  <div class="container split">
+    <div>
+      <div class="eyebrow">The studio</div>
+      <h2>A calm way to plan a loud day.</h2>
+      <p class="lede">{{ business.about_intro }}</p>
+    </div>
+    <img src="{{ url_for('static', filename='images/hero/about.jpg') }}" alt="A photographer working with natural light" style="border-radius:18px; height:420px; width:100%; object-fit:cover;">
+  </div>
+</section>
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+      <h2>Services</h2>
+      <a href="{{ url_for('public.services') }}">All services</a>
+    </div>
+    <div class="row g-3">
+      {% for service in services %}
+      <div class="col-md-4">
+        <article class="card-service">
+          <img src="{{ url_for('static', filename=service.image_path or 'images/services/wedding.jpg') }}" alt="">
+          <div class="body">
+            <h3 class="serif">{{ service.name }}</h3>
+            <p>{{ service.description[:140] }}{% if service.description|length > 140 %}…{% endif %}</p>
+            <div class="price">From {{ service.base_price|inr }}</div>
+            <a class="btn-line-dark mt-3" href="{{ url_for('public.enquiry', service=service.name) }}">Enquire</a>
+          </div>
+        </article>
+      </div>
+      {% else %}
+      <p>Services will appear here once they are added in the studio dashboard.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <h2>Selected work</h2>
+    <div class="gallery mt-3">
+      {% for item in portfolio %}
+      <a href="{{ url_for('public.portfolio') }}"><img src="{{ url_for('static', filename=item.src) }}" alt="{{ item.title }}"></a>
+      {% endfor %}
+    </div>
+    <a class="btn-ink mt-2" href="{{ url_for('public.portfolio') }}">Explore our work</a>
+  </div>
+</section>
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <h2>Why couples and teams stay.</h2>
+    <div class="why mt-3">
+      <article><h3 class="serif">One plan</h3><p>Enquiry, booking, coverage, edit, and album live in one workflow instead of scattered chats.</p></article>
+      <article><h3 class="serif">A named team</h3><p>A lead photographer, a cinematographer, and an editor are assigned before the event date.</p></article>
+      <article><h3 class="serif">Clear money</h3><p>Packages are published with a starting price. Advances and balances are tracked separately from the contract.</p></article>
+    </div>
+  </div>
+</section>
+{% if feedback %}
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <h2>Notes from clients</h2>
+    <div class="row g-3 mt-1">
+      {% for note in feedback %}
+      <div class="col-md-4">
+        <blockquote class="quote">
+          <p>“{{ note.comment }}”</p>
+          <div>{{ note.full_name }} · {{ note.city }}</div>
+        </blockquote>
+      </div>
+      {% endfor %}
+    </div>
+    <p class="fine">These notes are sample feedback stored for the demonstration.</p>
+  </div>
+</section>
+{% endif %}
+<section class="section" style="padding-top:0">
+  <div class="container info-card">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h2>Tell us the date.</h2>
+        <p class="mb-0">Share the celebration, the city, and a rough budget. The studio replies with what is possible.</p>
+      </div>
+      <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a class="btn-gold" href="{{ url_for('public.enquiry') }}">Book a consultation</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

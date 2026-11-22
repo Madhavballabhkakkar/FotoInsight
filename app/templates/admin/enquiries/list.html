@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+{% block title %}Enquiries{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Enquiries</h1><p class="sub">{{ pagination.total }} records{% if current_user.role == 'employee' %}, limited to ones assigned to you{% endif %}.</p></div>
+  {% if current_user.role == 'admin' %}<a class="btn-gold" href="{{ url_for('enquiries.new_enquiry') }}">Add enquiry</a>{% endif %}
+</div>
+<form class="filters" method="get">
+  <input name="q" value="{{ filters.get('q','') }}" placeholder="Name, phone, or code" aria-label="Search enquiries">
+  <select name="event_type" aria-label="Event type"><option value="">All event types</option>{% for item in event_types %}<option {{ 'selected' if filters.get('event_type')==item else '' }}>{{ item }}</option>{% endfor %}</select>
+  <select name="status" aria-label="Status"><option value="">All statuses</option>{% for key, label in enquiry_statuses %}<option value="{{ key }}" {{ 'selected' if filters.get('status')==key else '' }}>{{ label }}</option>{% endfor %}</select>
+  <input type="date" name="date_from" value="{{ filters.get('date_from','') }}" aria-label="From date">
+  <input type="date" name="date_to" value="{{ filters.get('date_to','') }}" aria-label="To date">
+  <button class="btn-quiet" type="submit">Filter</button>
+</form>
+<div class="panel" style="padding:0.4rem 0.8rem">
+  <table class="data">
+    <thead><tr><th>ID</th><th>Name</th><th>Event</th><th>Date</th><th>Status</th><th>Assigned</th></tr></thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td><a href="{{ url_for('enquiries.enquiry_detail', enquiry_id=row.id) }}">{{ row.enquiry_code }}</a></td>
+        <td>{{ row.full_name }}<div class="note">{{ row.phone }}</div></td>
+        <td>{{ row.event_type }}</td><td>{{ row.event_date or "—" }}</td>
+        <td><span class="status s-{{ row.status }}">{{ row.status|status_label }}</span></td>
+        <td>{{ row.assigned_name or "—" }}</td>
+      </tr>
+      {% else %}<tr><td colspan="6">No enquiries match.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if pagination.pages > 1 %}
+<div class="pager">
+  {% if pagination.page > 1 %}<a class="btn-quiet" href="{{ url_for('enquiries.enquiry_list', page=pagination.page-1, q=filters.get('q',''), event_type=filters.get('event_type',''), status=filters.get('status',''), date_from=filters.get('date_from',''), date_to=filters.get('date_to','')) }}">Previous</a>{% endif %}
+  <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+  {% if pagination.page < pagination.pages %}<a class="btn-quiet" href="{{ url_for('enquiries.enquiry_list', page=pagination.page+1, q=filters.get('q',''), event_type=filters.get('event_type',''), status=filters.get('status',''), date_from=filters.get('date_from',''), date_to=filters.get('date_to','')) }}">Next</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

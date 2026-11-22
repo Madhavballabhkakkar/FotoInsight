@@ -1,0 +1,25 @@
+{% extends "admin/base.html" %}
+{% block title %}Overview{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Overview</h1>
+    <p class="sub" id="range-label">Loading the studio numbers…</p>
+  </div>
+  <form class="filters" id="range-form">
+    <select name="preset" id="preset" aria-label="Date range">
+      {% for key, label in presets %}<option value="{{ key }}" {{ 'selected' if key == 'this_year' else '' }}>{{ label }}</option>{% endfor %}
+    </select>
+    <input type="date" name="start" id="start" hidden>
+    <input type="date" name="end" id="end" hidden>
+  </form>
+</div>
+<div class="kpis" id="kpi-grid"></div>
+<div id="highlights"></div>
+<div class="charts" id="chart-grid"></div>
+<p class="note mt-3" id="chart-note"></p>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

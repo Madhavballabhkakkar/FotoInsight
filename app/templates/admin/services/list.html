@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% block title %}Services{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Services and packages</h1><p class="sub">These prices are what the public website shows.</p></div>
+  <div class="d-flex gap-2">
+    <a class="btn-quiet" href="{{ url_for('services.new_package') }}">Add package</a>
+    <a class="btn-gold" href="{{ url_for('services.new_service') }}">Add service</a>
+  </div>
+</div>
+{% for service in services %}
+<section class="panel">
+  <div class="d-flex justify-content-between gap-3">
+    <div>
+      <h2>{{ service.name }} <span class="status s-{{ service.status }}">{{ service.status|status_label }}</span></h2>
+      <p>{{ service.description }}</p>
+      <p class="note">Starting price {{ service.base_price|inr }} · {{ service.category }}</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn-quiet" href="{{ url_for('services.edit_service', service_id=service.id) }}">Edit</a>
+      {% if service.status == 'active' %}
+      <button class="btn-quiet" type="button" data-post="{{ url_for('services.api_status', service_id=service.id) }}" data-body='{"status":"inactive"}'>Deactivate</button>
+      {% else %}
+      <button class="btn-quiet" type="button" data-post="{{ url_for('services.api_status', service_id=service.id) }}" data-body='{"status":"active"}'>Activate</button>
+      {% endif %}
+      <button class="btn-quiet" type="button" data-delete="{{ url_for('services.api_delete_service', service_id=service.id) }}" data-confirm="Delete this service?">Delete</button>
+    </div>
+  </div>
+  <table class="data">
+    <thead><tr><th>Package</th><th>Price</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for package in service.packages %}
+      <tr>
+        <td>{{ package.name }}<div class="note">{{ package.description }}</div></td>
+        <td>{{ package.price|inr }}</td>
+        <td><span class="status s-{{ package.status }}">{{ package.status|status_label }}</span></td>
+        <td><a href="{{ url_for('services.edit_package', package_id=package.id) }}">Edit</a>
+          <button type="button" data-delete="{{ url_for('services.api_delete_package', package_id=package.id) }}">Delete</button></td>
+      </tr>
+      {% else %}<tr><td colspan="4">No packages yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</section>
+{% else %}<p>No services yet.</p>{% endfor %}
+{% endblock %}

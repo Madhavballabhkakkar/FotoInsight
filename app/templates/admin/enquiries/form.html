@@ -1,0 +1,34 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ "Edit enquiry" if enquiry else "Add enquiry" }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{{ "Edit enquiry" if enquiry else "Add enquiry" }}</h1></div></div>
+<form class="stack panel" data-api="{{ url_for('enquiries.api_update', enquiry_id=enquiry.id) if enquiry else url_for('enquiries.api_create') }}" data-method="{{ 'PUT' if enquiry else 'POST' }}" data-redirect="{{ url_for('enquiries.enquiry_detail', enquiry_id=enquiry.id) if enquiry else '/admin/enquiries' }}">
+  <div class="alert alert-danger form-alert d-none"></div>
+  <label>Full name<input name="full_name" required value="{{ enquiry.full_name if enquiry else '' }}" {{ 'readonly' if current_user.role != 'admin' and enquiry else '' }}></label>
+  <label>Email<input name="email" type="email" required value="{{ enquiry.email if enquiry else '' }}"></label>
+  <label>Phone<input name="phone" required value="{{ enquiry.phone if enquiry else '' }}"></label>
+  <label>Event type
+    <input name="event_type" required list="event-types" value="{{ enquiry.event_type if enquiry else '' }}">
+    <datalist id="event-types">{% for service in services %}<option value="{{ service.name }}">{% endfor %}{% for item in event_types %}<option value="{{ item }}">{% endfor %}</datalist>
+  </label>
+  <label>Event date<input name="event_date" type="date" value="{{ enquiry.event_date if enquiry and enquiry.event_date else '' }}"></label>
+  <label>Event location<input name="event_location" value="{{ enquiry.event_location or '' if enquiry else '' }}"></label>
+  <label>City<input name="city" value="{{ enquiry.city or '' if enquiry else '' }}"></label>
+  <label>Guests<input name="guest_count" type="number" min="0" value="{{ enquiry.guest_count if enquiry and enquiry.guest_count is not none else '' }}"></label>
+  <label>Preferred package
+    <select name="package_id"><option value="">None</option>{% for package in packages %}<option value="{{ package.id }}" {{ 'selected' if enquiry and enquiry.package_id==package.id else '' }}>{{ package.service_name }} · {{ package.name }}</option>{% endfor %}</select>
+  </label>
+  <label>Estimated budget<input name="estimated_budget" type="number" min="0" step="0.01" value="{{ enquiry.estimated_budget if enquiry and enquiry.estimated_budget is not none else '' }}"></label>
+  <label>Status
+    <select name="status">{% for key, label in enquiry_statuses %}<option value="{{ key }}" {{ 'selected' if enquiry and enquiry.status==key else '' }}>{{ label }}</option>{% endfor %}</select>
+  </label>
+  {% if current_user.role == 'admin' %}
+  <label>Assign to
+    <select name="assigned_employee_id"><option value="">Unassigned</option>{% for person in employees %}<option value="{{ person.id }}" {{ 'selected' if enquiry and enquiry.assigned_employee_id==person.id else '' }}>{{ person.full_name }}</option>{% endfor %}</select>
+  </label>
+  {% endif %}
+  <label>Requirements<textarea name="requirements" rows="4">{{ enquiry.requirements or '' if enquiry else '' }}</textarea></label>
+  <button class="btn-gold" type="submit">Save enquiry</button>
+</form>
+<p class="note">Employees can change status and requirements. Other edits are kept by an administrator.</p>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+{% block title %}Projects{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Projects</h1><p class="sub">A project is delayed when the delivery date has passed and it is not finished.</p></div>
+  <div class="d-flex gap-2">
+    <a class="btn-quiet" href="{{ url_for('projects.project_list', delayed=0 if filters.get('delayed')=='1' else 1) }}">{{ "Show all" if filters.get('delayed')=='1' else "Delayed only" }}</a>
+    {% if current_user.role == 'admin' %}<a class="btn-gold" href="{{ url_for('projects.new_project') }}">Create project</a>{% endif %}
+  </div>
+</div>
+<form class="filters" method="get">
+  <input name="q" value="{{ filters.get('q','') }}" placeholder="Code, event, or customer" aria-label="Search projects">
+  <select name="status"><option value="">All statuses</option>{% for key, label in project_statuses %}<option value="{{ key }}" {{ 'selected' if filters.get('status')==key else '' }}>{{ label }}</option>{% endfor %}</select>
+  <button class="btn-quiet" type="submit">Filter</button>
+</form>
+<div class="panel" style="padding:0.4rem 0.8rem">
+  <table class="data">
+    <thead><tr><th>Project</th><th>Event</th><th>Customer</th><th>Photographer</th><th>Editor</th><th>Delivery</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td><a href="{{ url_for('projects.project_detail', project_id=row.id) }}">{{ row.project_code }}</a></td>
+        <td>{{ row.event_name }}</td><td>{{ row.customer_name }}</td>
+        <td>{{ row.photographer_name or "—" }}</td><td>{{ row.editor_name or "—" }}</td>
+        <td>{{ row.delivery_date or "—" }}{% if row.is_delayed %} · delayed{% endif %}</td>
+        <td><span class="status s-{{ row.status }}">{{ row.status|status_label }}</span></td>
+      </tr>
+      {% else %}<tr><td colspan="7">No projects match.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if pagination.pages > 1 %}
+<div class="pager">
+  {% if pagination.page > 1 %}<a class="btn-quiet" href="{{ url_for('projects.project_list', page=pagination.page-1, q=filters.get('q',''), status=filters.get('status',''), delayed=filters.get('delayed','')) }}">Previous</a>{% endif %}
+  <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+  {% if pagination.page < pagination.pages %}<a class="btn-quiet" href="{{ url_for('projects.project_list', page=pagination.page+1, q=filters.get('q',''), status=filters.get('status',''), delayed=filters.get('delayed','')) }}">Next</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

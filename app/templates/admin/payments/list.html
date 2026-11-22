@@ -1,0 +1,48 @@
+{% extends "admin/base.html" %}
+{% block title %}Payments{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Payments</h1><p class="sub">{{ revenue_definition }}</p></div>
+  <a class="btn-gold" href="{{ url_for('payments.new_payment') }}">Record payment</a>
+</div>
+<div class="kpis">
+  <article class="kpi"><span>Net revenue</span><strong style="font-size:1.5rem">{{ summary.net_revenue|inr }}</strong></article>
+  <article class="kpi"><span>Collected before refunds</span><strong style="font-size:1.5rem">{{ summary.collected|inr }}</strong></article>
+  <article class="kpi"><span>Refunds</span><strong style="font-size:1.5rem">{{ summary.refunds|inr }}</strong></article>
+  <article class="kpi"><span>Outstanding on active contracts</span><strong style="font-size:1.5rem">{{ summary.outstanding|inr }}</strong><small>Pending rows ({{ summary.pending_not_revenue|inr }}) are not revenue.</small></article>
+</div>
+<form class="filters" method="get">
+  <input name="q" value="{{ filters.get('q','') }}" placeholder="Customer, code, or reference" aria-label="Search payments">
+  <select name="status"><option value="">All statuses</option>{% for key, label in payment_statuses %}<option value="{{ key }}" {{ 'selected' if filters.get('status')==key else '' }}>{{ label }}</option>{% endfor %}</select>
+  <select name="method"><option value="">All methods</option>{% for key, label in payment_methods %}<option value="{{ key }}" {{ 'selected' if filters.get('method')==key else '' }}>{{ label }}</option>{% endfor %}</select>
+  <input type="date" name="date_from" value="{{ filters.get('date_from','') }}">
+  <input type="date" name="date_to" value="{{ filters.get('date_to','') }}">
+  <button class="btn-quiet" type="submit">Filter</button>
+</form>
+<div class="panel" style="padding:0.4rem 0.8rem">
+  <table class="data">
+    <thead><tr><th>Payment</th><th>Customer</th><th>Booking</th><th>Date</th><th>Method</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>{{ row.payment_code }}</td>
+        <td>{{ row.customer_name }}</td>
+        <td><a href="{{ url_for('bookings.booking_detail', booking_id=row.booking_id) }}">{{ row.booking_code }}</a></td>
+        <td>{{ row.payment_date }}</td>
+        <td>{{ row.method|status_label }}</td>
+        <td>{{ row.amount|inr }}</td>
+        <td><span class="status s-{{ row.status }}">{{ row.status|status_label }}</span></td>
+        <td><a href="{{ url_for('payments.edit_payment', payment_id=row.id) }}">Edit</a></td>
+      </tr>
+      {% else %}<tr><td colspan="8">No payments match.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if pagination.pages > 1 %}
+<div class="pager">
+  {% if pagination.page > 1 %}<a class="btn-quiet" href="{{ url_for('payments.payment_list', page=pagination.page-1, q=filters.get('q',''), status=filters.get('status',''), method=filters.get('method',''), date_from=filters.get('date_from',''), date_to=filters.get('date_to','')) }}">Previous</a>{% endif %}
+  <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+  {% if pagination.page < pagination.pages %}<a class="btn-quiet" href="{{ url_for('payments.payment_list', page=pagination.page+1, q=filters.get('q',''), status=filters.get('status',''), method=filters.get('method',''), date_from=filters.get('date_from',''), date_to=filters.get('date_to','')) }}">Next</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

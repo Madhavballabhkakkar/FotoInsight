@@ -1,0 +1,69 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ "Edit booking" if booking else "Create booking" }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{{ "Edit booking" if booking else "Create booking" }}</h1><p class="sub">Linking an enquiry marks it converted and blocks a second conversion.</p></div></div>
+<form class="stack panel" id="booking-form" data-api="{{ url_for('bookings.api_update', booking_id=booking.id) if booking else url_for('bookings.api_create') }}" data-method="{{ 'PUT' if booking else 'POST' }}" data-redirect="{{ '/admin/bookings/' ~ booking.id if booking else '/admin/bookings/:id' }}">
+  <div class="alert alert-danger form-alert d-none"></div>
+  <label>Customer
+    <select name="customer_id" required>{% for person in customers %}<option value="{{ person.id }}" {{ 'selected' if booking and booking.customer_id==person.id else '' }}>{{ person.full_name }} · {{ person.city }}</option>{% endfor %}</select>
+  </label>
+  {% if not booking %}
+  <label>Enquiry
+    <select name="enquiry_id"><option value="">No enquiry</option>{% for item in enquiries %}<option value="{{ item.id }}">{{ item.enquiry_code }} · {{ item.full_name }}</option>{% endfor %}</select>
+  </label>
+  {% endif %}
+  <label>Service
+    <select name="service_id" id="service_id" required>{% for service in services %}<option value="{{ service.id }}" {{ 'selected' if booking and booking.service_id==service.id else '' }}>{{ service.name }}</option>{% endfor %}</select>
+  </label>
+  <label>Package
+    <select name="package_id" id="package_id"><option value="">No package</option>{% for package in packages %}<option value="{{ package.id }}" data-service="{{ package.service_id }}" {{ 'selected' if booking and booking.package_id==package.id else '' }}>{{ package.name }} · {{ package.price|inr }}</option>{% endfor %}</select>
+  </label>
+  <label>Event name<input name="event_name" required value="{{ booking.event_name if booking else '' }}"></label>
+  <label>Event date<input name="event_date" type="date" required value="{{ booking.event_date if booking else '' }}"></label>
+  <label>Event location<input name="event_location" required value="{{ booking.event_location if booking else '' }}"></label>
+  <label>City<input name="city" required value="{{ booking.city if booking else '' }}"></label>
+  <label>Total contract amount<input name="total_amount" type="number" min="1" step="0.01" required value="{{ booking.total_amount if booking else '' }}"></label>
+  <label>Status
+    <select name="status">{% for key, label in booking_statuses %}<option value="{{ key }}" {{ 'selected' if booking and booking.status==key else '' }}>{{ label }}</option>{% endfor %}</select>
+  </label>
+  <label>Notes<textarea name="notes" rows="3">{{ booking.notes or '' if booking else '' }}</textarea></label>
+  <div>
+    <strong>Team</strong>
+    <div id="team-rows">
+      {% if booking %}
+        {% for member in booking.team %}
+        <div class="filters team-row">
+          <select class="employee"><option value="">Employee</option>{% for person in employees %}<option value="{{ person.id }}" {{ 'selected' if member.employee_id==person.id else '' }}>{{ person.full_name }}</option>{% endfor %}</select>
+          <select class="role">{% for role in team_roles %}<option {{ 'selected' if member.team_role==role else '' }}>{{ role }}</option>{% endfor %}</select>
+          <label><input type="checkbox" class="lead" {{ 'checked' if member.is_lead else '' }}> Lead</label>
+        </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <button class="btn-quiet" type="button" id="add-team">Add team member</button>
+  </div>
+  <button class="btn-gold" type="submit">Save booking</button>
+</form>
+<template id="team-template">
+  <div class="filters team-row">
+    <select class="employee"><option value="">Employee</option>{% for person in employees %}<option value="{{ person.id }}">{{ person.full_name }}</option>{% endfor %}</select>
+    <select class="role">{% for role in team_roles %}<option>{{ role }}</option>{% endfor %}</select>
+    <label><input type="checkbox" class="lead"> Lead</label>
+  </div>
+</template>
+{% endblock %}
+{% block scripts %}
+<script>
+registerCollector("booking-form", (body) => {
+  body.team = Array.from(document.querySelectorAll(".team-row")).map((row) => ({
+    employee_id: row.querySelector(".employee").value,
+    team_role: row.querySelector(".role").value,
+    is_lead: row.querySelector(".lead").checked,
+  })).filter((item) => item.employee_id);
+  return body;
+});
+document.getElementById("add-team").addEventListener("click", () => {
+  document.getElementById("team-rows").appendChild(document.getElementById("team-template").content.cloneNode(true));
+});
+</script>
+{% endblock %}

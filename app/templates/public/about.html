@@ -1,0 +1,39 @@
+{% extends "public/base.html" %}
+{% block title %}About · {{ business.business_name }}{% endblock %}
+{% block body %}
+<header class="page-hero" style="background-image:linear-gradient(180deg, rgba(247,244,239,0.2), rgba(247,244,239,1)), url('{{ url_for('static', filename='images/hero/about.jpg') }}')">
+  <div class="container">
+    <div class="eyebrow">About</div>
+    <h1>Made for the long day and the quiet edit.</h1>
+  </div>
+</header>
+<section class="section" style="padding-top:2rem">
+  <div class="container" style="max-width:860px">
+    <p class="lede">{{ business.about_intro }}</p>
+    <h2>Mission</h2>
+    <p>{{ business.mission }}</p>
+    <h2>Vision</h2>
+    <p>{{ business.vision }}</p>
+    <h2>What the studio covers</h2>
+    <p>Wedding photography, pre-wedding sessions, destination weddings, corporate and private events, birthdays, engagements, cinematography, and wedding albums. {{ service_count }} of those services are currently offered on the services page. The list and the prices are edited from the studio dashboard, not written into the page by hand.</p>
+    <h2>How a job is run</h2>
+    <p>A lead photographer holds the day. A cinematographer covers film when the booking includes it. An editor takes the project from the event date to delivery. That is the expertise this studio is organised around: planning, photographing, and finishing, with the dates visible to the whole crew.</p>
+    <h2>People and roles</h2>
+    <p>The names below are sample staff records so the dashboard can assign photographers and editors. They are not a claim about a real crew.</p>
+    {% for person in team %}
+    <div class="team-card">
+      <strong>{{ person.full_name }}</strong>
+      <div>{{ person.job_title }} · {{ person.city }}</div>
+    </div>
+    {% else %}
+    <p>Staff profiles will appear here after they are added in settings.</p>
+    {% endfor %}
+    <h2>How the studio works with clients</h2>
+    <div class="why">
+      <article><h3 class="serif">Listen first</h3><p>The enquiry captures the date, the city, the guest count, and the budget before anyone promises a package.</p></article>
+      <article><h3 class="serif">Write it down</h3><p>A booking names the package, the team, and the contract amount. Money received is recorded as it arrives.</p></article>
+      <article><h3 class="serif">Deliver on a date</h3><p>Each booked event can become a project with a photographer, an editor, and a delivery date.</p></article>
+    </div>
+  </div>
+</section>
+{% endblock %}

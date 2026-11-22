@@ -1,0 +1,27 @@
+{% extends "admin/base.html" %}
+{% block title %}Analytics{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Analytics</h1>
+    <p class="sub" id="range-label">Pandas and NumPy calculate these figures from MySQL. Nothing on this page is typed in by hand.</p>
+  </div>
+  <form class="filters" id="range-form">
+    <select id="preset" aria-label="Date range">{% for key, label in presets %}<option value="{{ key }}" {{ 'selected' if key=='this_year' else '' }}>{{ label }}</option>{% endfor %}</select>
+    <input type="date" id="start" hidden>
+    <input type="date" id="end" hidden>
+  </form>
+</div>
+<section class="panel">
+  <h2>How the numbers are defined</h2>
+  <p>{{ revenue_definition }}</p>
+  <p>{{ conversion_definition }}</p>
+  <p class="note">Customer segments use business rules: high-value is the top quarter of lifetime collected spend, returning means two or more bookings, a prospect has no booking yet. Wedding season treats November–February as peak, March, April and October as moderate, and May–September as lean. That is a labeled rule for this demo, not a claim about a real studio.</p>
+  <p class="note">Each chart names its date. Revenue uses the payment date. Enquiries, and the booking counts in Service performance, use the day the record was created. Seasonal demand uses the event date, so a wedding booked this year for next year appears in the service table now and in the seasonal chart only when the event itself falls in the selected dates.</p>
+</section>
+<div id="analytics-root"><p class="note">Loading calculations…</p></div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+{% endblock %}

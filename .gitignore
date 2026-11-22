@@ -1,0 +1,13 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+instance/
+*.log
+.DS_Store
+.vercel
+app/static/uploads/*
+!app/static/uploads/.gitkeep

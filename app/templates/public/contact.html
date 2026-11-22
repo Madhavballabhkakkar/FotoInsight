@@ -1,0 +1,49 @@
+{% extends "public/base.html" %}
+{% block title %}Contact · {{ business.business_name }}{% endblock %}
+{% block body %}
+<header class="page-hero" style="background-image:linear-gradient(180deg, rgba(247,244,239,.2), rgba(247,244,239,1)), url('{{ url_for('static', filename='images/hero/contact.jpg') }}')">
+  <div class="container">
+    <div class="eyebrow">Contact</div>
+    <h1>Write, or call the studio line.</h1>
+  </div>
+</header>
+<section class="section" style="padding-top:1rem">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-5">
+        <div class="info-card">
+          <h2>Studio</h2>
+          <p>{{ business.business_name }}</p>
+          <p>{{ business.address }}<br>{{ business.city }}</p>
+          <p>Email: {{ business.email }}<br>Phone: {{ business.phone }}</p>
+          <p class="fine">These contact details are sample values stored in settings. Replace them before using the site for a real studio. The social links are configurable and are not presented as verified official accounts.</p>
+          <div>
+            {% if business.instagram_url %}<a href="{{ business.instagram_url }}">Instagram</a> · {% endif %}
+            {% if business.facebook_url %}<a href="{{ business.facebook_url }}">Facebook</a> · {% endif %}
+            {% if business.youtube_url %}<a href="{{ business.youtube_url }}">YouTube</a>{% endif %}
+          </div>
+        </div>
+        <iframe class="map-frame mt-3" title="Map showing the sample studio area" src="https://www.openstreetmap.org/export/embed.html?bbox={{ (business.map_lng - 0.03)|round(5) }}%2C{{ (business.map_lat - 0.02)|round(5) }}%2C{{ (business.map_lng + 0.03)|round(5) }}%2C{{ (business.map_lat + 0.02)|round(5) }}&amp;layer=mapnik&amp;marker={{ business.map_lat }}%2C{{ business.map_lng }}"></iframe>
+      </div>
+      <div class="col-md-7">
+        <div class="success-box" {% if not submitted %}hidden{% endif %}>
+          <h2>Message received</h2>
+          <p data-message>It is saved with the enquiries.</p>
+          <strong data-code>{{ submitted or "" }}</strong>
+        </div>
+        <form method="post" action="{{ url_for('public.contact') }}" data-public="{{ url_for('public.api_contact') }}" {% if submitted %}hidden{% endif %}>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="submission_token" value="">
+          {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+          <div class="alert alert-danger form-alert d-none"></div>
+          <div class="mb-3"><label class="form-label" for="full_name">Full name</label><input class="form-control" id="full_name" name="full_name" required></div>
+          <div class="mb-3"><label class="form-label" for="email">Email</label><input class="form-control" id="email" type="email" name="email" required></div>
+          <div class="mb-3"><label class="form-label" for="phone">Phone</label><input class="form-control" id="phone" name="phone" required></div>
+          <div class="mb-3"><label class="form-label" for="message">Message</label><textarea class="form-control" id="message" name="message" rows="5" required></textarea></div>
+          <button class="btn-gold" type="submit">Send message</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

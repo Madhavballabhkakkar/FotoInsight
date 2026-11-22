@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ "Edit customer" if customer else "Add customer" }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{{ "Edit customer" if customer else "Add customer" }}</h1></div></div>
+<form class="stack panel" id="customer-form" data-api="{{ url_for('customers.api_update', customer_id=customer.id) if customer else url_for('customers.api_create') }}" data-method="{{ 'PUT' if customer else 'POST' }}" data-redirect="{{ url_for('customers.customer_detail', customer_id=customer.id) if customer else '/admin/customers/:id' }}">
+  <div class="alert alert-danger form-alert d-none"></div>
+  <label>Full name<input name="full_name" required value="{{ customer.full_name if customer else '' }}"></label>
+  <label>Email<input name="email" type="email" required value="{{ customer.email if customer else '' }}"></label>
+  <label>Phone<input name="phone" required value="{{ customer.phone if customer else '' }}"></label>
+  <label>City<input name="city" required value="{{ customer.city if customer else '' }}"></label>
+  <label>Address<input name="address" value="{{ customer.address or '' if customer else '' }}"></label>
+  <label>Registration date<input name="registration_date" type="date" required value="{{ customer.registration_date if customer else '' }}"></label>
+  <button class="btn-gold" type="submit">Save customer</button>
+</form>
+{% endblock %}

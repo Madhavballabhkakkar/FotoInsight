@@ -1,0 +1,48 @@
+{% extends "admin/base.html" %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Reports</h1><p class="sub">Each file includes the date range, summary figures, tables, and a note that the rows are demo data.</p></div>
+</div>
+<form class="filters" id="report-form" method="get">
+  <select name="preset" id="report-preset" aria-label="Date range">{% for key, label in presets %}<option value="{{ key }}" {{ 'selected' if key=='this_year' else '' }}>{{ label }}</option>{% endfor %}</select>
+  <input type="date" name="start" id="report-start" hidden>
+  <input type="date" name="end" id="report-end" hidden>
+  <select name="format" aria-label="File type">
+    <option value="pdf">PDF</option>
+    <option value="xlsx">Excel</option>
+    <option value="csv">CSV</option>
+  </select>
+</form>
+<div class="row g-3">
+  {% for key, title in reports.items() %}
+  <div class="col-md-6">
+    <article class="panel">
+      <h2>{{ title }}</h2>
+      <button class="btn-gold" type="button" data-report="{{ key }}">Download</button>
+    </article>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById("report-preset").addEventListener("change", (event) => {
+  const custom = event.target.value === "custom";
+  document.getElementById("report-start").hidden = !custom;
+  document.getElementById("report-end").hidden = !custom;
+});
+document.querySelectorAll("[data-report]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const form = document.getElementById("report-form");
+    const preset = document.getElementById("report-preset").value;
+    if (preset === "custom" && (!form.start.value || !form.end.value)) {
+      window.alert("Choose both dates for a custom range.");
+      return;
+    }
+    const params = new URLSearchParams(new FormData(form));
+    window.location = `/api/reports/${button.dataset.report}?${params.toString()}`;
+  });
+});
+</script>
+{% endblock %}

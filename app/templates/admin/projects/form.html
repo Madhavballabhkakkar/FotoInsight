@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ "Edit project" if project else "Create project" }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{{ "Edit project" if project else "Create project" }}</h1></div></div>
+<form class="stack panel" data-api="{{ url_for('projects.api_update', project_id=project.id) if project else url_for('projects.api_create') }}" data-method="{{ 'PUT' if project else 'POST' }}" data-redirect="{{ url_for('projects.project_list') }}">
+  <div class="alert alert-danger form-alert d-none"></div>
+  <label>Booking
+    <select name="booking_id" required {{ 'disabled' if project else '' }}>{% for booking in bookings %}<option value="{{ booking.id }}" {{ 'selected' if project and project.booking_id==booking.id else '' }}>{{ booking.booking_code }} · {{ booking.customer_name }} · {{ booking.event_name }}</option>{% endfor %}</select>
+  </label>
+  {% if project %}<input type="hidden" name="booking_id" value="{{ project.booking_id }}">{% endif %}
+  <label>Photographer<select name="photographer_id"><option value="">Unassigned</option>{% for person in employees %}<option value="{{ person.id }}" {{ 'selected' if project and project.photographer_id==person.id else '' }}>{{ person.full_name }} · {{ person.job_title }}</option>{% endfor %}</select></label>
+  <label>Editor<select name="editor_id"><option value="">Unassigned</option>{% for person in employees %}<option value="{{ person.id }}" {{ 'selected' if project and project.editor_id==person.id else '' }}>{{ person.full_name }} · {{ person.job_title }}</option>{% endfor %}</select></label>
+  <label>Start date<input name="start_date" type="date" value="{{ project.start_date if project and project.start_date else '' }}"></label>
+  <label>Delivery date<input name="delivery_date" type="date" value="{{ project.delivery_date if project and project.delivery_date else '' }}"></label>
+  <label>Status<select name="status">{% for key, label in project_statuses %}<option value="{{ key }}" {{ 'selected' if project and project.status==key else '' }}>{{ label }}</option>{% endfor %}</select></label>
+  <label>Notes<textarea name="notes" rows="3">{{ project.notes or '' if project else '' }}</textarea></label>
+  <button class="btn-gold" type="submit">Save project</button>
+</form>
+{% endblock %}

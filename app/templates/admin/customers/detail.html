@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ customer.full_name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>{{ customer.full_name }}</h1><p class="sub">{{ code }} · {{ customer.email }} · {{ customer.phone }}</p></div>
+  <div class="d-flex gap-2">
+    <a class="btn-quiet" href="{{ url_for('customers.edit_customer', customer_id=customer.id) }}">Edit</a>
+    {% if current_user.role == 'admin' %}<button class="btn-quiet" type="button" data-delete="{{ url_for('customers.api_delete', customer_id=customer.id) }}" data-after="{{ url_for('customers.customer_list') }}">Delete</button>{% endif %}
+  </div>
+</div>
+<div class="kpis">
+  <article class="kpi"><span>City</span><strong style="font-size:1.4rem">{{ customer.city }}</strong></article>
+  <article class="kpi"><span>Registered</span><strong style="font-size:1.4rem">{{ customer.registration_date }}</strong></article>
+  <article class="kpi"><span>Bookings</span><strong>{{ customer.total_bookings }}</strong></article>
+  <article class="kpi"><span>Collected spend</span><strong style="font-size:1.4rem">{{ customer.total_spending|inr }}</strong></article>
+</div>
+<div class="panel">
+  <h2>Booking history</h2>
+  <table class="data">
+    <thead><tr><th>Booking</th><th>Event</th><th>Date</th><th>Contract</th><th>Collected</th><th>Outstanding</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for row in history %}
+      <tr>
+        <td><a href="{{ url_for('bookings.booking_detail', booking_id=row.id) }}">{{ row.booking_code }}</a></td>
+        <td>{{ row.event_name }}</td><td>{{ row.event_date }}</td>
+        <td>{{ row.total_amount|inr }}</td><td>{{ row.received|inr }}</td><td>{{ row.outstanding|inr }}</td>
+        <td><span class="status s-{{ row.status }}">{{ row.status|status_label }}</span></td>
+      </tr>
+      {% else %}<tr><td colspan="7">No bookings yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

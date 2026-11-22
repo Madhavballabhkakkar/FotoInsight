@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+{% block title %}Customers{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Customers</h1><p class="sub">{{ pagination.total }} people. Spending is collected money, not the booking contract.</p></div>
+  {% if current_user.role == 'admin' %}<a class="btn-gold" href="{{ url_for('customers.new_customer') }}">Add customer</a>{% endif %}
+</div>
+<form class="filters" method="get">
+  <input name="q" value="{{ filters.get('q','') }}" placeholder="Name, email, or phone" aria-label="Search customers">
+  <select name="city" aria-label="City"><option value="">All cities</option>{% for city in cities %}<option {{ 'selected' if filters.get('city')==city else '' }}>{{ city }}</option>{% endfor %}</select>
+  <select name="sort" aria-label="Sort">
+    <option value="newest" {{ 'selected' if filters.get('sort','newest')=='newest' else '' }}>Newest</option>
+    <option value="name" {{ 'selected' if filters.get('sort')=='name' else '' }}>Name</option>
+    <option value="spending" {{ 'selected' if filters.get('sort')=='spending' else '' }}>Spending</option>
+    <option value="bookings" {{ 'selected' if filters.get('sort')=='bookings' else '' }}>Bookings</option>
+  </select>
+  <button class="btn-quiet" type="submit">Filter</button>
+</form>
+<div class="panel" style="padding:0.4rem 0.8rem">
+  <table class="data">
+    <thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>City</th><th>Registered</th><th>Bookings</th><th>Spending</th><th></th></tr></thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>CUS-{{ "%05d"|format(row.id) }}</td>
+        <td><a href="{{ url_for('customers.customer_detail', customer_id=row.id) }}">{{ row.full_name }}</a><div class="note">{{ row.email }}</div></td>
+        <td>{{ row.phone }}</td><td>{{ row.city }}</td><td>{{ row.registration_date }}</td>
+        <td>{{ row.total_bookings }}</td><td>{{ row.total_spending|inr }}</td>
+        <td><a href="{{ url_for('customers.edit_customer', customer_id=row.id) }}">Edit</a></td>
+      </tr>
+      {% else %}<tr><td colspan="8">No customers match.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if pagination.pages > 1 %}
+<div class="pager">
+  {% if pagination.page > 1 %}<a class="btn-quiet" href="{{ url_for('customers.customer_list', page=pagination.page-1, q=filters.get('q',''), city=filters.get('city',''), sort=filters.get('sort','newest')) }}">Previous</a>{% endif %}
+  <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+  {% if pagination.page < pagination.pages %}<a class="btn-quiet" href="{{ url_for('customers.customer_list', page=pagination.page+1, q=filters.get('q',''), city=filters.get('city',''), sort=filters.get('sort','newest')) }}">Next</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

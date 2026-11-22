@@ -1,0 +1,56 @@
+{% extends "public/base.html" %}
+{% block title %}Enquiry · {{ business.business_name }}{% endblock %}
+{% block body %}
+<header class="page-hero">
+  <div class="container">
+    <div class="eyebrow">Enquiry</div>
+    <h1>Tell us about the day.</h1>
+  </div>
+</header>
+<section class="section" style="padding-top:1rem">
+  <div class="container" style="max-width:820px">
+    <div class="success-box" {% if not submitted %}hidden{% endif %}>
+      <h2>Enquiry received</h2>
+      <p data-message>Your reference is below. The studio can find it in the enquiry desk.</p>
+      <strong data-code>{{ submitted or "" }}</strong>
+    </div>
+    <form method="post" action="{{ url_for('public.enquiry') }}" data-public="{{ url_for('public.api_enquiry') }}" {% if submitted %}hidden{% endif %}>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="submission_token" value="">
+      {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+      <div class="alert alert-danger form-alert d-none"></div>
+      <div class="row g-3">
+        <div class="col-md-6"><label class="form-label" for="full_name">Full name</label><input class="form-control" id="full_name" name="full_name" required maxlength="150"></div>
+        <div class="col-md-6"><label class="form-label" for="email">Email address</label><input class="form-control" id="email" name="email" type="email" required></div>
+        <div class="col-md-6"><label class="form-label" for="phone">Phone number</label><input class="form-control" id="phone" name="phone" required placeholder="+91 98XXXXXXXX"></div>
+        <div class="col-md-6">
+          <label class="form-label" for="event_type">Event type</label>
+          <select class="form-select" id="event_type" name="event_type" required>
+            <option value="">Choose a service</option>
+            {% for service in services %}
+            <option value="{{ service.name }}" {{ 'selected' if selected_service == service.name else '' }}>{{ service.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6"><label class="form-label" for="event_date">Event date</label><input class="form-control" id="event_date" name="event_date" type="date" required></div>
+        <div class="col-md-6"><label class="form-label" for="event_location">Event location</label><input class="form-control" id="event_location" name="event_location" required maxlength="180"></div>
+        <div class="col-md-6"><label class="form-label" for="city">City</label><input class="form-control" id="city" name="city" maxlength="80"></div>
+        <div class="col-md-6"><label class="form-label" for="guest_count">Number of guests</label><input class="form-control" id="guest_count" name="guest_count" type="number" min="0" step="1"></div>
+        <div class="col-md-6">
+          <label class="form-label" for="package_id">Preferred package</label>
+          <select class="form-select" id="package_id" name="package_id">
+            <option value="">No package preference</option>
+            {% for package in packages %}
+            <option value="{{ package.id }}" data-service="{{ package.service_name }}" {{ 'selected' if selected_package == package.id|string else '' }}>{{ package.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6"><label class="form-label" for="estimated_budget">Estimated budget (INR)</label><input class="form-control" id="estimated_budget" name="estimated_budget" type="number" min="0" step="0.01"></div>
+        <div class="col-12"><label class="form-label" for="requirements">Additional requirements</label><textarea class="form-control" id="requirements" name="requirements" rows="4" maxlength="2000"></textarea></div>
+      </div>
+      <button class="btn-gold mt-3" type="submit">Submit enquiry</button>
+    </form>
+    <script id="package-data" type="application/json">{{ packages|tojson }}</script>
+  </div>
+</section>
+{% endblock %}
