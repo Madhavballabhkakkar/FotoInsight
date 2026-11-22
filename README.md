@@ -106,8 +106,8 @@ For a server:
 APP_ENV=production gunicorn -w 2 -b 127.0.0.1:8000 "run:app"
 ```
 
-`/health` returns `{"ok": true, "database": "up"}` when MySQL answers.
+`/health` returns `{"ok": true, "database": "up"}` when SQLite answers.
 
 ## Technology
 
-HTML, CSS, JavaScript, Bootstrap 5, Chart.js, Python, Flask, Jinja, MySQL, Pandas, NumPy, scikit-learn (forecast only), fpdf2, and openpyxl. No React, Node, or MongoDB.
+HTML, CSS, JavaScript, Bootstrap 5, Chart.js, Python, Flask, Jinja, SQLite, Pandas, NumPy, scikit-learn (forecast only), fpdf2, and openpyxl. Local JSON/CSV/Excel export and Firebase REST sync are also included. No React, Node, or MongoDB.
