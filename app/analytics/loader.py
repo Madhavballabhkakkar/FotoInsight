@@ -1,4 +1,4 @@
-"""Load MySQL rows into Pandas tables for the analytics functions."""
+"""Load SQLite rows into Pandas tables for the analytics functions."""
 
 import numpy as np
 import pandas as pd

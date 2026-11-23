@@ -1,0 +1,69 @@
+Table 2.1: Internship Duration and Mode
+Figure 3.1: Level-0 Context Diagram of the FotoInsight Studio Platform
+Figure 3.2: System Architecture and Data Flow Overview of FotoInsight on Render
+Table 3.1: Week-wise Training Activities and Learning Outcomes
+Figure 4.1: SDLC and Production Deployment Flowchart for FotoInsight
+Figure 4.2: Level-1 Data Flow Diagram (DFD) of FotoInsight
+Figure 4.3: Entity-Relationship Diagram (ERD) of the 13 SQLite Tables
+Figure 4.4: Use Case Diagram of the FotoInsight Platform
+Figure 4.5: Status Lifecycles of Enquiries, Bookings, Projects and Payments
+Figure 4.6: Deployment Flow of FotoInsight from GitHub to Render
+Table 4.1: Major Engineering and Deployment Blockers Resolved During the Internship
+Table 4.2: Functional, Security and Deployment Test Case Summary
+Table 5.1: Front-end Technologies
+Table 5.2: Back-end Technologies
+Table 5.3: Hardware Platform Used for Development and Testing
+Table 5.4: Tools Used During the Internship
+Table 6.1: Median Response Time of Main Routes (milliseconds)
+Table 6.2: Evaluation of Delivered Outcomes Against the Objectives of Section 1.3
+Table 10.1: Project Artifacts and Their Location
+Table 11.1: Deployment Components and Resource Identifiers
+Table 12.1: Abbreviations Used in This Report
+Figure A.1: Level-1 Data Flow Diagram of the FotoInsight Studio Platform
+Figure A.2: Level-2 Data Flow Diagram - Authentication, CSRF Check, Session and Role Gate
+Figure A.3: Level-2 Data Flow Diagram - Public Enquiry Capture, Status Workflow and Conversion to Booking
+Figure A.4: Level-2 Data Flow Diagram - Payments, Balance Check and Signed Revenue Rule
+Figure A.5: Level-2 Data Flow Diagram - Analytics Pipeline with Pandas, NumPy and the Forecast Guard
+Figure A.6: Level-2 Data Flow Diagram - Reports, Local Export and Firebase Sync
+Table A.1: Process Summary Table
+Figure B.1: Entity-Relationship Diagram (ERD) of the FotoInsight SQLite Database
+Figure B.2: Status Lifecycles of Enquiries, Bookings, Projects and Payments
+Table B.1: Entity Relationship and Cardinality Summary
+Figure C.1: UML Use-Case Diagram of the FotoInsight Studio Platform
+Table C.1: Actor and Use-Case Summary
+Table D.1: Employees Table (employees)
+Table D.2: Users Table (users)
+Table D.3: Customers Table (customers)
+Table D.4: Services Table (services)
+Table D.5: Packages Table (packages)
+Table D.6: Enquiries Table (enquiries)
+Table D.7: Enquiry Notes Table (enquiry_notes)
+Table D.8: Bookings Table (bookings)
+Table D.9: Booking Team Table (booking_team)
+Table D.10: Payments Table (payments)
+Table D.11: Projects Table (projects)
+Table D.12: Customer Feedback Table (customer_feedback)
+Table D.13: Business Settings Table (business_settings)
+Figure E.1: Public home page of the live FotoInsight site hosted on Render
+Figure E.2: About page with mission, vision and the way a job is run
+Figure E.3: Services page with starting prices, packages and the Enquire button
+Figure E.4: Portfolio gallery with category filters
+Figure E.5: Contact page with studio details and message form
+Figure E.6: Event enquiry form of the public site
+Figure E.7: Studio login page
+Figure E.8: Overview dashboard with KPI cards, definitions and insight sentences
+Figure E.9: Customer list with filters, bookings and collected spending
+Figure E.10: Enquiry list with filters, status badges and assigned employee
+Figure E.11: Booking list with contract, collected and outstanding amounts
+Figure E.12: Payments page with net revenue, refunds and outstanding amount
+Figure E.13: Project list with team, delivery date and delayed marker
+Figure E.14: Reports page with six reports and format selector
+Figure E.15: Settings page with business information
+Figure E.16: Data Sync page with local export and Firebase REST buttons
+Figure E.17: Analytics page with definitions and business insights
+Figure E.18: Revenue analytics with monthly line chart and revenue by service
+Figure E.19: Customer analytics with segments and high-value customers
+Figure E.20: Enquiry conversion analytics for the selected range
+Figure E.21: Service performance table
+Figure E.22: Seasonal demand with season table, month strip and weekday chart
+Figure E.23: Forecast section with the hidden-forecast message
